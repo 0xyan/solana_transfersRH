@@ -6,14 +6,18 @@ import json
 
 load_dotenv()
 API_KEY = os.getenv("HELIUS_API_KEY")
-WEBHOOK_URL = "https://ec7a-171-97-216-9.ngrok-free.app"
+WEBHOOK_URL = "https://41d3-171-96-191-176.ngrok-free.app"
 
 
 def get_existing_webhooks():
     url = f"https://api.helius.xyz/v0/webhooks?api-key={API_KEY}"
     response = requests.get(url)
-    print(f"\nExisting webhooks: {response.json()}")
-    return response.json()
+    webhooks = response.json()
+    print(
+        f"\nFound {len(webhooks)} existing webhooks: "
+        + ", ".join([hook["webhookID"] for hook in webhooks])
+    )
+    return webhooks
 
 
 def delete_webhook(webhook_id):
@@ -23,7 +27,7 @@ def delete_webhook(webhook_id):
 
 
 def register_webhooks(accounts):
-    # Delete existing webhooks first
+    # Delete existing webhooks
     existing = get_existing_webhooks()
     for webhook in existing:
         delete_webhook(webhook["webhookID"])
@@ -40,8 +44,8 @@ def register_webhooks(accounts):
     response = requests.post(url, json=payload)
     if response.status_code == 200:
         print(f"Successfully registered webhook for {len(accounts)} accounts")
-    else:
-        print(f"Failed to create webhook: {response.text}")
+        return True, response.json()
+    return False, None
 
 
 if __name__ == "__main__":
@@ -50,11 +54,11 @@ if __name__ == "__main__":
         f"Using API key: {API_KEY[:4]}...{API_KEY[-4:]}"
     )  # Show first/last 4 chars of API key
     print(f"Webhook URL: {WEBHOOK_URL}")
-    print(f"Monitoring wallets: {main_wallets}")
+    print(f"Monitoring wallets: {len(main_wallets)}")
 
     status, response = register_webhooks(main_wallets)
 
-    if status == 200:
+    if status:
         print("\nWebhook registration successful!")
     else:
         print("\nWebhook registration failed!")

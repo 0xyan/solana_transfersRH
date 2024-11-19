@@ -11,7 +11,7 @@ TRACKED_TOKENS = {
     "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263": "BONK",
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA": "WIF",
     "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN": "JUP",
-    "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": "USDC",
+    # "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": "USDC", #for testing
 }
 
 
@@ -25,9 +25,7 @@ def load_all_wallets(csv_path="deposit_wallets.csv"):
         # Combine with main wallets and remove any duplicates
         all_wallets = list(set(MAIN_WALLETS + deposit_wallets))
 
-        print(f"Loaded {len(deposit_wallets)} deposit wallets")
-        print(f"Added {len(MAIN_WALLETS)} main wallets")
-        print(f"Total unique wallets: {len(all_wallets)}")
+        print(f"Loaded unique wallets: {len(all_wallets)}")
 
         return all_wallets
     except Exception as e:
