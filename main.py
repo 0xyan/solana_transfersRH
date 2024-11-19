@@ -23,40 +23,25 @@ def delete_webhook(webhook_id):
 
 
 def register_webhooks(accounts):
-    # Delete existing webhooks
+    # Delete existing webhooks first
     existing = get_existing_webhooks()
     for webhook in existing:
         delete_webhook(webhook["webhookID"])
 
-    # Register new webhook
+    # Create single webhook for all accounts
     url = f"https://api.helius.xyz/v0/webhooks?api-key={API_KEY}"
     payload = {
         "webhookURL": WEBHOOK_URL,
         "transactionTypes": ["TRANSFER"],
-        "accountAddresses": accounts,
+        "accountAddresses": accounts,  # All 9,460 accounts in one webhook
         "webhookType": "enhanced",
     }
 
-    print(f"\nSending payload: {payload}")
-
-    try:
-        response = requests.post(url, json=payload)
-        print(f"Response status code: {response.status_code}")
-        print(f"Response content: {response.text}")
-
-        if response.status_code != 200:
-            print(f"Error details: {response.text}")
-
-        return response.status_code, (
-            response.json() if response.status_code == 200 else None
-        )
-
-    except requests.exceptions.RequestException as e:
-        print(f"Request error: {e}")
-        return 500, None
-    except json.JSONDecodeError as e:
-        print(f"JSON decode error: {e}")
-        return 500, None
+    response = requests.post(url, json=payload)
+    if response.status_code == 200:
+        print(f"Successfully registered webhook for {len(accounts)} accounts")
+    else:
+        print(f"Failed to create webhook: {response.text}")
 
 
 if __name__ == "__main__":
