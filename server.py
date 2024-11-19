@@ -5,14 +5,13 @@ import uvicorn
 from acc_list import main_wallets, TRACKED_TOKENS
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
+    level=logging.WARNING,
+    format="%(message)s",
     handlers=[logging.FileHandler("token_transfers.log"), logging.StreamHandler()],
 )
 logger = logging.getLogger(__name__)
 app = FastAPI()
 
-# Cache for deduplication
 processed_txs = {}
 
 
@@ -29,13 +28,12 @@ async def webhook(request: Request):
 
         return {"status": "success"}
     except Exception as e:
-        logger.error(f"Error in webhook endpoint: {e}")
+        logger.error(f"Error processing webhook: {str(e)}")
         return {"status": "error", "message": str(e)}
 
 
 async def process_event(event):
     try:
-        # Only process if there are token transfers
         if not event.get("tokenTransfers"):
             return
 
@@ -48,27 +46,22 @@ async def process_event(event):
         for transfer in event["tokenTransfers"]:
             token_address = transfer.get("mint")
 
-            # Only process tracked tokens
             if token_address not in TRACKED_TOKENS:
+                continue
+
+            to_address = transfer.get("toUserAccount")
+
+            # Only process incoming transfers to our wallets
+            if to_address not in main_wallets:
                 continue
 
             token_name = TRACKED_TOKENS[token_address]
             from_address = transfer.get("fromUserAccount")
-            to_address = transfer.get("toUserAccount")
-
-            # Only process if our wallets are involved
-            if not any(wallet in [from_address, to_address] for wallet in main_wallets):
-                continue
-
-            raw_amount = transfer.get("amount", 0)
-            decimals = {"USDC": 6, "BONK": 5, "WIF": 6, "JUP": 6}.get(token_name, 6)
-
-            amount = float(raw_amount) / (10**decimals)
-            direction = "INCOMING" if to_address in main_wallets else "OUTGOING"
+            amount = float(transfer.get("tokenAmount", 0))
 
             transfer_info = (
                 f"\n{'='*50}\n"
-                f"NEW {direction} TRANSFER DETECTED!\n"
+                f"NEW INCOMING TRANSFER!\n"
                 f"Token: {token_name}\n"
                 f"Amount: {amount:,.6f}\n"
                 f"From: {from_address}\n"
@@ -78,11 +71,10 @@ async def process_event(event):
                 f"{'='*50}"
             )
 
-            print(transfer_info)
-            logger.info(transfer_info)
+            logger.warning(transfer_info)
 
     except Exception as e:
-        logger.error(f"Error processing event: {e}")
+        logger.error(f"Error processing transfer: {str(e)}")
 
 
 @app.get("/")
@@ -92,4 +84,6 @@ async def health_check():
 
 if __name__ == "__main__":
     print("Server starting on port 8000...")
+    print(f"Monitoring incoming transfers to wallets: {main_wallets}")
+    print(f"Tracking tokens: {list(TRACKED_TOKENS.values())}")
     uvicorn.run(app, host="0.0.0.0", port=8000)
