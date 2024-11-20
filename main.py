@@ -37,7 +37,7 @@ def register_webhooks(accounts):
     payload = {
         "webhookURL": WEBHOOK_URL,
         "transactionTypes": ["TRANSFER"],
-        "accountAddresses": accounts,  # All 9,460 accounts in one webhook
+        "accountAddresses": accounts,
         "webhookType": "enhanced",
     }
 
@@ -45,7 +45,9 @@ def register_webhooks(accounts):
     if response.status_code == 200:
         print(f"Successfully registered webhook for {len(accounts)} accounts")
         return True, response.json()
-    return False, None
+    else:
+        print(f"Failed to create webhook: {response.status_code} - {response.text}")
+        return False, None
 
 
 if __name__ == "__main__":
