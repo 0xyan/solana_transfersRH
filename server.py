@@ -81,8 +81,7 @@ async def process_event(event):
 
             transfer_info = (
                 f"\n{'='*50}\n"
-                f"NEW INCOMING TRANSFER!\n"
-                f"Token: {token_name}\n"
+                f"NEW {token_name} INCOMING TRANSFER on ROBINHOOD!\n"
                 f"Amount: {amount:,.6f}\n"
                 f"From: {from_address}\n"
                 f"To: {to_address}\n"
@@ -96,12 +95,11 @@ async def process_event(event):
 
             # Telegram notification
             message = (
-                f"🔔 <b>New Incoming Transfer</b>\n\n"
-                f"💰 Token: {token_name}\n"
-                f"📊 Amount: {amount:,.6f}\n"
-                f"📤 From: <code>{from_address[:8]}...{from_address[-8:]}</code>\n"
-                f"📥 To: <code>{to_address[:8]}...{to_address[-8:]}</code>\n"
-                f"🔗 <a href='https://solscan.io/tx/{tx_signature}'>View Transaction</a>"
+                f"🔔 <b>New {token_name} Incoming Transfer on Robinhood</b>\n\n"
+                f"Amount: {amount:,.6f}\n"
+                f"From: <code>{from_address[:8]}...{from_address[-8:]}</code>\n"
+                f"To: <code>{to_address[:8]}...{to_address[-8:]}</code>\n"
+                f"<a href='https://solscan.io/tx/{tx_signature}'>View Transaction</a>"
             )
             send_telegram_message(message)
 
