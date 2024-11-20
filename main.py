@@ -13,10 +13,7 @@ def get_existing_webhooks():
     url = f"https://api.helius.xyz/v0/webhooks?api-key={API_KEY}"
     response = requests.get(url)
     webhooks = response.json()
-    print(
-        f"\nFound {len(webhooks)} existing webhooks: "
-        + ", ".join([hook["webhookID"] for hook in webhooks])
-    )
+    print(f"\nFound {len(webhooks)} existing webhooks")
     return webhooks
 
 
@@ -27,10 +24,16 @@ def delete_webhook(webhook_id):
 
 
 def register_webhooks(accounts):
-    # Delete existing webhooks
+    # Get existing webhooks
     existing = get_existing_webhooks()
+
+    # Only delete webhooks that match our WEBHOOK_URL
     for webhook in existing:
-        delete_webhook(webhook["webhookID"])
+        if webhook.get("webhookURL") == WEBHOOK_URL:
+            print(
+                f"Deleting webhook {webhook['webhookID']} matching URL: {WEBHOOK_URL}"
+            )
+            delete_webhook(webhook["webhookID"])
 
     # Create single webhook for all accounts
     url = f"https://api.helius.xyz/v0/webhooks?api-key={API_KEY}"
