@@ -8,7 +8,7 @@ import json
 load_dotenv(override=True)
 
 API_KEY = os.getenv("HELIUS_API_KEY")
-WEBHOOK_URL = "https://f7b6-124-120-193-76.ngrok-free.app"
+WEBHOOK_URL = "http://113.30.188.29:8000"
 
 
 def get_existing_webhooks():
