@@ -86,7 +86,7 @@ async def process_event(event):
             transfer_info = (
                 f"\n{'='*50}\n"
                 f"NEW {token_name} INCOMING TRANSFER on ROBINHOOD!\n"
-                f"Amount: {amount:,.6f}\n"
+                f"Amount: {amount:,.2f}\n"
                 f"From: {from_address}\n"
                 f"To: {to_address}\n"
                 f"Transaction: {tx_signature}\n"
