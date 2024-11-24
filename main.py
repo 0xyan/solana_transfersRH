@@ -4,9 +4,11 @@ from dotenv import load_dotenv
 from acc_list import main_wallets
 import json
 
-load_dotenv()
+# Force reload environment variables
+load_dotenv(override=True)
+
 API_KEY = os.getenv("HELIUS_API_KEY")
-WEBHOOK_URL = "https://302aa8a8356c.ngrok.app"
+WEBHOOK_URL = "https://f7b6-124-120-193-76.ngrok-free.app"
 
 
 def get_existing_webhooks():

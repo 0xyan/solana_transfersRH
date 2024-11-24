@@ -3,8 +3,11 @@ import logging
 from datetime import datetime
 import uvicorn
 from acc_list import main_wallets, TRACKED_TOKENS
+from dotenv import load_dotenv
 import requests
 import os
+
+load_dotenv(override=True)
 
 logging.basicConfig(
     level=logging.WARNING,
@@ -28,6 +31,7 @@ def send_telegram_message(message):
         "text": message,
         "parse_mode": "HTML",
     }
+
     try:
         response = requests.post(url, params=params)
         return response.json()
@@ -95,16 +99,19 @@ async def process_event(event):
 
             # Telegram notification
             message = (
-                f"🔔 <b>New {token_name} Incoming Transfer on Robinhood</b>\n\n"
+                f"🔔 <b>New {token_name} Incoming Transfer</b>\n\n"
                 f"Amount: {amount:,.6f}\n"
                 f"From: <code>{from_address[:8]}...{from_address[-8:]}</code>\n"
                 f"To: <code>{to_address[:8]}...{to_address[-8:]}</code>\n"
                 f"<a href='https://solscan.io/tx/{tx_signature}'>View Transaction</a>"
             )
+
+            logger.debug("Attempting to send Telegram message...")
             send_telegram_message(message)
+            logger.debug("Telegram message sent (or attempted)")
 
     except Exception as e:
-        logger.error(f"Error processing transfer: {str(e)}")
+        logger.error(f"Error in process_event: {str(e)}", exc_info=True)
 
 
 @app.get("/")
