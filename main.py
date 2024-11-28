@@ -64,7 +64,7 @@ if __name__ == "__main__":
     print(f"Using API key: {API_KEY[:4]}...{API_KEY[-4:]}")
     print(f"Webhook URL: {WEBHOOK_URL}")
 
-    main_wallets = main_wallets()
+    main_wallets = main_wallets
     print(f"Number of wallets to monitor: {len(main_wallets)}")
 
     status, response = register_webhooks(main_wallets)
