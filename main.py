@@ -4,7 +4,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 import os
 from dotenv import load_dotenv
-from acc_list import get_main_wallets
+from acc_list import main_wallets
 
 load_dotenv(override=True)
 
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     print(f"Using API key: {API_KEY[:4]}...{API_KEY[-4:]}")
     print(f"Webhook URL: {WEBHOOK_URL}")
 
-    main_wallets = get_main_wallets()
+    main_wallets = main_wallets()
     print(f"Number of wallets to monitor: {len(main_wallets)}")
 
     status, response = register_webhooks(main_wallets)
