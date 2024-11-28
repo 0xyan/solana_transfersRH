@@ -5,6 +5,8 @@ MAIN_WALLETS = [
     "8Tp9fFkZ2KcRBLYDTUNXo98Ez6ojGb6MZEPXfGDdeBzG",  # Cold (only interacts with MM receiver)
     "6brjeZNfSpqjWoo16z1YbywKguAruXZhNz9bJMVZE8pD",  # MM receiver
     "CdkLi5GK8kGTNmHCTe1dem2dXxgU2V2Yxh5s4xPuk9UY",  # USDC hot wallet
+    "AbdxrST5risqoSDB76Yk6cvGJRdrHrGXxUrZ4VxZHGZU",  # WIF hot wallet
+    "CQWxRn2iW5qSxfBaEDaZSym4ZhVjpeXsgSDvw9PehnLj",  # WIF BONK testing wallet
 ]
 
 TRACKED_TOKENS = {
