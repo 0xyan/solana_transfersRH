@@ -52,6 +52,4 @@ def load_all_wallets(csv_path="deposit_wallets.csv"):
         return MAIN_WALLETS  # Fallback to main wallets if CSV loading fails
 
 
-# Don't load wallets immediately, create a function to get them
-def get_main_wallets():
-    return load_all_wallets()
+main_wallets = load_all_wallets()
