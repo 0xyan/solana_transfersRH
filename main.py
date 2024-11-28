@@ -1,43 +1,45 @@
 import requests
+from time import sleep
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 import os
 from dotenv import load_dotenv
-from acc_list import main_wallets
-import json
+from acc_list import get_main_wallets
 
-# Force reload environment variables
 load_dotenv(override=True)
 
 API_KEY = os.getenv("HELIUS_API_KEY")
-WEBHOOK_URL = "http://113.30.188.29:8000"
+WEBHOOK_URL = "https://54.79.31.7:80"
+
+
+def create_session():
+    session = requests.Session()
+    retries = Retry(total=3, backoff_factor=1, status_forcelist=[502, 503, 504])
+    session.mount("https://", HTTPAdapter(max_retries=retries))
+    return session
 
 
 def get_existing_webhooks():
     url = f"https://api.helius.xyz/v0/webhooks?api-key={API_KEY}"
-    response = requests.get(url)
-    webhooks = response.json()
-    print(f"\nFound {len(webhooks)} existing webhooks")
-    return webhooks
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        webhooks = response.json()
 
-
-def delete_webhook(webhook_id):
-    url = f"https://api.helius.xyz/v0/webhooks/{webhook_id}?api-key={API_KEY}"
-    response = requests.delete(url)
-    print(f"Deleted webhook {webhook_id}: {response.status_code}")
+        if webhooks:
+            active_webhooks = [w for w in webhooks if w.get("active", False)]
+            print(f"\nFound {len(active_webhooks)} active webhooks")
+            return webhooks
+        return []
+    except Exception as e:
+        print(f"Warning: Could not fetch existing webhooks: {e}")
+        print("Continuing with webhook registration anyway...")
+        return []
 
 
 def register_webhooks(accounts):
-    # Get existing webhooks
-    existing = get_existing_webhooks()
+    _ = get_existing_webhooks()
 
-    # Only delete webhooks that match our WEBHOOK_URL
-    for webhook in existing:
-        if webhook.get("webhookURL") == WEBHOOK_URL:
-            print(
-                f"Deleting webhook {webhook['webhookID']} matching URL: {WEBHOOK_URL}"
-            )
-            delete_webhook(webhook["webhookID"])
-
-    # Create single webhook for all accounts
     url = f"https://api.helius.xyz/v0/webhooks?api-key={API_KEY}"
     payload = {
         "webhookURL": WEBHOOK_URL,
@@ -46,26 +48,29 @@ def register_webhooks(accounts):
         "webhookType": "enhanced",
     }
 
-    response = requests.post(url, json=payload)
-    if response.status_code == 200:
-        print(f"Successfully registered webhook for {len(accounts)} accounts")
-        return True, response.json()
-    else:
-        print(f"Failed to create webhook: {response.status_code} - {response.text}")
+    try:
+        response = requests.post(url, json=payload)
+        response.raise_for_status()
+        webhook_id = response.json().get("webhookID", "N/A")
+        print(f"Successfully registered new webhook (ID: {webhook_id})")
+        return True, {"webhookID": webhook_id}
+    except Exception as e:
+        print(f"Failed to create webhook: {e}")
         return False, None
 
 
 if __name__ == "__main__":
     print("Starting webhook registration...")
-    print(
-        f"Using API key: {API_KEY[:4]}...{API_KEY[-4:]}"
-    )  # Show first/last 4 chars of API key
+    print(f"Using API key: {API_KEY[:4]}...{API_KEY[-4:]}")
     print(f"Webhook URL: {WEBHOOK_URL}")
-    print(f"Monitoring wallets: {len(main_wallets)}")
+
+    main_wallets = get_main_wallets()
+    print(f"Number of wallets to monitor: {len(main_wallets)}")
 
     status, response = register_webhooks(main_wallets)
 
     if status:
         print("\nWebhook registration successful!")
+        print("Webhook ID:", response.get("webhookID", "N/A"))
     else:
         print("\nWebhook registration failed!")

@@ -99,7 +99,9 @@ async def process_event(event):
 
             # Telegram notification
             message = (
-                f"🔔 <b>New {token_name} Robinhood transfer</b>\n\n"
+                f"<b>Incoming {token_name} Robinhood transfer</b>\n\n"
+                f"From: {from_address[:4]}...{from_address[-4:]}\n"
+                f"To: {to_address[:4]}...{to_address[-4:]}\n"
                 f"Amount: {amount:,.2f}\n"
                 f"<a href='https://solscan.io/tx/{tx_signature}'>View Transaction</a>"
             )
