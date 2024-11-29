@@ -9,6 +9,18 @@ MAIN_WALLETS = [
     "CQWxRn2iW5qSxfBaEDaZSym4ZhVjpeXsgSDvw9PehnLj",  # WIF BONK testing wallet
 ]
 
+EXCLUDED_WALLETS = {
+    "BY4StcU9Y2BpgH8quZzorg31EGE4L1rjomN8FNsCBEcx",  # htx hot wallet
+    "5tzFkiKscXHK5ZXCGbXZxdw7gTjjD1mBwuoFbhUvuAi9",  # binance 2
+    "FWznbcNXWQuHTawe9RxvQ2LdCENssh12dsznf4RiouN5",  # kraken
+    "9un5wqE3q4oCjyrDkwsdD48KteCJitQX5978Vh7KKxHo",  # OKX 2
+    "5sTQ5ih7xtctBhMXHr3f1aWdaXazWrWfoehqWdqWnTFP",  # wintermute
+    "5BCgqYg51CANe8qUMPYWJsqRA4Y8HnyfmvkoJxcEmQfY",  # bybit
+    "AobVSwdW9BbpMdJvTqeCN4hPAmh4rHm7vwLnQ5ATSyrS",  # cryptcom 2
+    "H8sMJSCQxfKiFTCfDR3DUMLPwcRbM61LGFJ8N4dK3WjS",  # cb 1
+    "2AQdpHJ2JpcEgPiATUXjQxA8QmafFegfQwSLWSprPicm",  # cb 2
+}
+
 TRACKED_TOKENS = {
     "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263": "BONK",
     "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R": "RAY",
@@ -44,12 +56,16 @@ def load_all_wallets(csv_path="deposit_wallets.csv"):
         # Combine with main wallets and remove any duplicates
         all_wallets = list(set(MAIN_WALLETS + deposit_wallets))
 
-        print(f"Loaded unique wallets: {len(all_wallets)}")
+        # Remove excluded wallets
+        all_wallets = [w for w in all_wallets if w not in EXCLUDED_WALLETS]
 
+        print(f"Loaded unique wallets: {len(all_wallets)}")
         return all_wallets
     except Exception as e:
         print(f"Error loading wallets: {e}")
-        return MAIN_WALLETS  # Fallback to main wallets if CSV loading fails
+        return [
+            w for w in MAIN_WALLETS if w not in EXCLUDED_WALLETS
+        ]  # Also filter fallback list
 
 
 main_wallets = load_all_wallets()

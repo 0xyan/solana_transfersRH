@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 import logging
 from datetime import datetime
 import uvicorn
-from acc_list import main_wallets, TRACKED_TOKENS
+from acc_list import main_wallets, TRACKED_TOKENS, MAIN_WALLETS, load_all_wallets
 from dotenv import load_dotenv
 import requests
 import os
@@ -18,6 +18,11 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 processed_txs = {}
+
+# Load deposit wallets once when server starts
+deposit_wallets = set(load_all_wallets()) - set(
+    MAIN_WALLETS
+)  # Get only deposit wallets
 
 
 # Add Telegram sending function
@@ -97,9 +102,19 @@ async def process_event(event):
             # Log to console/file
             logger.warning(transfer_info)
 
+            # Determine wallet type flags
+            is_main_wallet = to_address in MAIN_WALLETS
+            is_deposit_wallet = to_address in deposit_wallets
+
+            wallet_flag = ""
+            if is_main_wallet:
+                wallet_flag = "🚨 MAIN WALLET"
+            elif is_deposit_wallet:
+                wallet_flag = "📥 DEPOSIT WALLET"
+
             # Telegram notification
             message = (
-                f"<b>Incoming {token_name} Robinhood transfer</b>\n\n"
+                f"<b>{wallet_flag} RH {token_name} transfer</b>\n\n"
                 f"From: {from_address[:4]}...{from_address[-4:]}\n"
                 f"To: {to_address[:4]}...{to_address[-4:]}\n"
                 f"Amount: {amount:,.2f}\n"

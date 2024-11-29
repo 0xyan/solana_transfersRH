@@ -9,7 +9,7 @@ from acc_list import main_wallets
 load_dotenv(override=True)
 
 API_KEY = os.getenv("HELIUS_API_KEY")
-WEBHOOK_URL = "https://54.79.31.7:80"
+WEBHOOK_URL = "http://54.79.31.7:8000"
 
 
 def create_session():
