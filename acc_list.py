@@ -19,6 +19,7 @@ EXCLUDED_WALLETS = {
     "AobVSwdW9BbpMdJvTqeCN4hPAmh4rHm7vwLnQ5ATSyrS",  # cryptcom 2
     "H8sMJSCQxfKiFTCfDR3DUMLPwcRbM61LGFJ8N4dK3WjS",  # cb 1
     "2AQdpHJ2JpcEgPiATUXjQxA8QmafFegfQwSLWSprPicm",  # cb 2
+    "HBxZShcE86UMmF93KUM8eWJKqeEXi5cqWCLYLMMhqMYm",  # bitstamp hot
 }
 
 TRACKED_TOKENS = {
